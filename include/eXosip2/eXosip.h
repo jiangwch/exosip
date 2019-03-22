@@ -50,6 +50,15 @@
 #include <osipparser2/sdp_message.h>
 #include <time.h>
 
+
+/* TAKEN from rcf2617.txt */
+
+#define HASHLEN 16
+typedef char HASH[HASHLEN];
+
+#define HASHHEXLEN 32
+typedef char HASHHEX[HASHHEXLEN + 1];
+
 /**
  * @file eXosip.h
  * @brief eXosip API
@@ -414,6 +423,14 @@ extern "C" {
  * @param excontext    eXosip_t instance.
  */
   int eXosip_event_geteventsocket (struct eXosip_t *excontext);
+
+
+  //
+  void DigestCalcHA1(const char *pszAlg, const char *pszUserName, const char *pszRealm, const char *pszPassword, 
+	  const char *pszNonce, const char *pszCNonce, HASHHEX SessionKey);
+  void DigestCalcResponse(HASHHEX HA1, const char *pszNonce, const char *pszNonceCount, const char *pszCNonce, 
+	  const char *pszQop, int Aka, const char *pszMethod, const char *pszDigestUri, HASHHEX HEntity, HASHHEX Response);
+  //
 
 /** @} */
 

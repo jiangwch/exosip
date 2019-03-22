@@ -100,9 +100,9 @@ AMF amfstar = "\0\0";
 
 /* Private functions */
 void CvtHex (IN HASH Bin, OUT HASHHEX Hex);
-static void DigestCalcHA1 (IN const char *pszAlg, IN const char *pszUserName, IN const char *pszRealm, IN const char *pszPassword, IN const char *pszNonce, IN const char *pszCNonce, OUT HASHHEX SessionKey);
-static void DigestCalcResponse (IN HASHHEX HA1, IN const char *pszNonce,
-                                IN const char *pszNonceCount, IN const char *pszCNonce, IN const char *pszQop, IN int Aka, IN const char *pszMethod, IN const char *pszDigestUri, IN HASHHEX HEntity, OUT HASHHEX Response);
+//static void DigestCalcHA1 (IN const char *pszAlg, IN const char *pszUserName, IN const char *pszRealm, IN const char *pszPassword, IN const char *pszNonce, IN const char *pszCNonce, OUT HASHHEX SessionKey);
+//static void DigestCalcResponse (IN HASHHEX HA1, IN const char *pszNonce,
+//                                IN const char *pszNonceCount, IN const char *pszCNonce, IN const char *pszQop, IN int Aka, IN const char *pszMethod, IN const char *pszDigestUri, IN HASHHEX HEntity, OUT HASHHEX Response);
 static void DigestCalcResponseAka (IN const char *pszPassword, IN const char *pszNonce, IN const char *pszCNonce, IN const char *pszQop, IN const char *pszMethod, IN const char *pszDigestUri, IN int version, OUT HASHHEX Response);
 
 void
@@ -127,7 +127,7 @@ CvtHex (IN HASH Bin, OUT HASHHEX Hex)
 }
 
 /* calculate H(A1) as per spec */
-static void
+/*static */void
 DigestCalcHA1 (IN const char *pszAlg, IN const char *pszUserName, IN const char *pszRealm, IN const char *pszPassword, IN const char *pszNonce, IN const char *pszCNonce, OUT HASHHEX SessionKey)
 {
   osip_MD5_CTX Md5Ctx;
@@ -153,7 +153,7 @@ DigestCalcHA1 (IN const char *pszAlg, IN const char *pszUserName, IN const char 
 }
 
 /* calculate request-digest/response-digest as per HTTP Digest spec */
-static void
+/*static */void
 DigestCalcResponse (IN HASHHEX HA1,     /* H(A1) */
                     IN const char *pszNonce,    /* nonce from server */
                     IN const char *pszNonceCount,       /* 8 hex digits */
