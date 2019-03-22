@@ -99,6 +99,7 @@
 #include <openssl/x509.h>
 #if !(OPENSSL_VERSION_NUMBER < 0x10002000L)
 #include <openssl/x509v3.h>
+#include <openssl/engine.h>
 #endif
 #include <openssl/rand.h>
 #include <openssl/tls1.h>
@@ -841,7 +842,8 @@ verify_cb (int preverify_ok, X509_STORE_CTX * store)
    * it for something special
    */
   if (!preverify_ok && (err == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT)) {
-    X509_NAME_oneline (X509_get_issuer_name (store->current_cert), buf, 256);
+    // X509_NAME_oneline (X509_get_issuer_name (store->current_cert), buf, 256);
+    X509_NAME_oneline (X509_get_issuer_name (X509_STORE_CTX_get_current_cert(store)), buf, 256);
     OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_ERROR, NULL, "issuer= %s\n", buf));
   }
 
@@ -1160,7 +1162,7 @@ initialize_client_ctx (struct eXosip_t * excontext, const char *certif_client_lo
       }
       else {
         /* this is used to add a trusted certificate */
-        X509_STORE_add_cert (ctx->cert_store, cert);
+        X509_STORE_add_cert (SSL_CTX_get_cert_store(ctx), cert);
       }
       BIO_free (bio);
     }
@@ -1233,14 +1235,17 @@ initialize_client_ctx (struct eXosip_t * excontext, const char *certif_client_lo
 	const X509_VERIFY_PARAM *param = X509_VERIFY_PARAM_lookup ("ssl_server");
 	
 	if (param != NULL) { /* const value, we have to copy (inherit) */
-	  if (X509_VERIFY_PARAM_inherit (pkix_validation_store->param, param)) {
+	  //if (X509_VERIFY_PARAM_inherit (pkix_validation_store->param, param)) {
+	  if (X509_VERIFY_PARAM_inherit (X509_STORE_get0_param(pkix_validation_store), param)) {
 	    X509_STORE_set_flags (pkix_validation_store, X509_V_FLAG_TRUSTED_FIRST);
 	    X509_STORE_set_flags (pkix_validation_store, X509_V_FLAG_PARTIAL_CHAIN);
 	  } else {
 	    OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_ERROR, NULL, "PARAM_inherit: failed for ssl_server\n"));
 	  }
-	  if (X509_VERIFY_PARAM_set1_host (pkix_validation_store->param, sni_servernameindication, 0)) {
-	    X509_VERIFY_PARAM_set_hostflags (pkix_validation_store->param, X509_CHECK_FLAG_NO_WILDCARDS);
+	  //if (X509_VERIFY_PARAM_set1_host (pkix_validation_store->param, sni_servernameindication, 0)) {
+	  if (X509_VERIFY_PARAM_set1_host (X509_STORE_get0_param(pkix_validation_store), sni_servernameindication, 0)) {
+	    // X509_VERIFY_PARAM_set_hostflags (pkix_validation_store->param, X509_CHECK_FLAG_NO_WILDCARDS);
+	    X509_VERIFY_PARAM_set_hostflags (X509_STORE_get0_param(pkix_validation_store), X509_CHECK_FLAG_NO_WILDCARDS);
 	  } else {
 	    OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_ERROR, NULL, "PARAM_set1_host: %s failed\n", sni_servernameindication));
 	  }

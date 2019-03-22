@@ -233,7 +233,8 @@ shutdown_free_client_dtls (struct eXosip_t *excontext, int pos)
 
       BIO_ctrl (rbio, BIO_CTRL_DGRAM_SET_PEER, 0, (char *) &addr);
 
-      (reserved->socket_tab[pos].ssl_conn)->rbio = rbio;
+      // (reserved->socket_tab[pos].ssl_conn)->rbio = rbio;
+      SSL_set0_rbio(reserved->socket_tab[pos].ssl_conn, rbio);
 
       i = SSL_shutdown (reserved->socket_tab[pos].ssl_conn);
 
@@ -562,12 +563,14 @@ dtls_tl_read_message (struct eXosip_t *excontext, fd_set * osip_fdset, fd_set * 
       rbio = BIO_new_mem_buf (enc_buf, enc_buf_len);
       BIO_set_mem_eof_return (rbio, -1);
 
-      reserved->socket_tab[pos].ssl_conn->rbio = rbio;
+      // reserved->socket_tab[pos].ssl_conn->rbio = rbio;
+      SSL_set0_rbio(reserved->socket_tab[pos].ssl_conn, rbio);
 
       i = SSL_read (reserved->socket_tab[pos].ssl_conn, dec_buf, SIP_MESSAGE_MAX_LENGTH);
       /* done with the rbio */
-      BIO_free (reserved->socket_tab[pos].ssl_conn->rbio);
-      reserved->socket_tab[pos].ssl_conn->rbio = BIO_new (BIO_s_mem ());
+      // BIO_free (reserved->socket_tab[pos].ssl_conn->rbio);
+      // reserved->socket_tab[pos].ssl_conn->rbio = BIO_new (BIO_s_mem ());
+      SSL_set0_rbio(reserved->socket_tab[pos].ssl_conn, BIO_new (BIO_s_mem ()));
 
       if (i > 5) {
         dec_buf[i] = '\0';
@@ -947,7 +950,8 @@ dtls_tl_send_message (struct eXosip_t *excontext, osip_transaction_t * tr, osip_
         _dtls_stream_used = &reserved->socket_tab[pos];
         rbio = BIO_new_dgram (reserved->dtls_socket, BIO_NOCLOSE);
         BIO_ctrl (rbio, BIO_CTRL_DGRAM_SET_PEER, 0, (char *) &addr);
-        reserved->socket_tab[pos].ssl_conn->rbio = rbio;
+        // reserved->socket_tab[pos].ssl_conn->rbio = rbio;
+        SSL_set0_rbio(reserved->socket_tab[pos].ssl_conn, rbio);
         break;
       }
     }
@@ -961,7 +965,8 @@ dtls_tl_send_message (struct eXosip_t *excontext, osip_transaction_t * tr, osip_
           _dtls_stream_used = &reserved->socket_tab[pos];
           rbio = BIO_new_dgram (reserved->dtls_socket, BIO_NOCLOSE);
           BIO_ctrl (rbio, BIO_CTRL_DGRAM_SET_PEER, 0, (char *) &addr);
-          reserved->socket_tab[pos].ssl_conn->rbio = rbio;
+          // reserved->socket_tab[pos].ssl_conn->rbio = rbio;
+          SSL_set0_rbio(reserved->socket_tab[pos].ssl_conn, rbio);
           break;
         }
       }
