@@ -50,24 +50,24 @@ _eXosip_insubscription_transaction_find (struct eXosip_t *excontext, int tid, eX
     }
     for (*jd = (*jn)->n_dialogs; *jd != NULL; *jd = (*jd)->next) {
       osip_list_iterator_t it;
-      osip_transaction_t* transaction;
+      osip_transaction_t *transaction;
 
-      transaction = (osip_transaction_t*)osip_list_get_first((*jd)->d_inc_trs, &it);
+      transaction = (osip_transaction_t *) osip_list_get_first ((*jd)->d_inc_trs, &it);
       while (transaction != OSIP_SUCCESS) {
         if (transaction != NULL && transaction->transactionid == tid) {
           *tr = transaction;
           return OSIP_SUCCESS;
         }
-        transaction = (osip_transaction_t *)osip_list_get_next(&it);
+        transaction = (osip_transaction_t *) osip_list_get_next (&it);
       }
 
-      transaction = (osip_transaction_t*)osip_list_get_first((*jd)->d_out_trs, &it);
+      transaction = (osip_transaction_t *) osip_list_get_first ((*jd)->d_out_trs, &it);
       while (transaction != OSIP_SUCCESS) {
         if (transaction != NULL && transaction->transactionid == tid) {
           *tr = transaction;
           return OSIP_SUCCESS;
         }
-        transaction = (osip_transaction_t *)osip_list_get_next(&it);
+        transaction = (osip_transaction_t *) osip_list_get_next (&it);
       }
     }
   }
@@ -148,9 +148,10 @@ eXosip_insubscription_send_answer (struct eXosip_t *excontext, int tid, int stat
   osip_transaction_t *tr = NULL;
   osip_event_t *evt_answer;
 
-  if (tid <= 0)
+  if (tid <= 0) {
+    osip_message_free (answer);
     return OSIP_BADPARAMETER;
-
+  }
   if (tid > 0) {
     _eXosip_insubscription_transaction_find (excontext, tid, &jn, &jd, &tr);
   }
@@ -279,7 +280,7 @@ eXosip_insubscription_build_notify (struct eXosip_t *excontext, int did, int sub
 
   tmp = subscription_state + strlen (subscription_state);
   if (subscription_status != EXOSIP_SUBCRSTATE_TERMINATED)
-    snprintf (tmp, 50 - (tmp - subscription_state), "%li", jn->n_ss_expires - now);
+    snprintf (tmp, 50 - (tmp - subscription_state), "%li", (long) (jn->n_ss_expires - now));
   osip_message_set_header (*request, "Subscription-State", subscription_state);
 #endif
 
