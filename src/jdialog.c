@@ -1,17 +1,17 @@
 /*
   eXosip - This is the eXtended osip library.
   Copyright (C) 2001-2015 Aymeric MOIZARD amoizard@antisip.com
-  
+
   eXosip is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
-  
+
   eXosip is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -74,8 +74,12 @@ _eXosip_subscription_dialog_find (struct eXosip_t *excontext, int sid, eXosip_su
     return OSIP_BADPARAMETER;
   for (*js = excontext->j_subscribes; *js != NULL; *js = (*js)->next) {
     *jd = NULL;
-    if ((*js)->s_id == sid)
+    // if ((*js)->s_id == sid)
+    //   return OSIP_SUCCESS;
+    if ((*js)->s_id == sid) {
+      *jd = (*js)->s_dialogs;
       return OSIP_SUCCESS;
+    }
     for (*jd = (*js)->s_dialogs; *jd != NULL; *jd = (*jd)->next) {
       if ((*jd)->d_id == sid)
         return OSIP_SUCCESS;
