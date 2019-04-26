@@ -1,17 +1,17 @@
 /*
   eXosip - This is the eXtended osip library.
   Copyright (C) 2001-2015 Aymeric MOIZARD amoizard@antisip.com
-  
+
   eXosip is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
   (at your option) any later version.
-  
+
   eXosip is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -602,13 +602,14 @@ _eXosip_process_notify_within_dialog (struct eXosip_t *excontext, eXosip_subscri
     return;
   }
 #endif
-
+  OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_INFO1, NULL, "Start Build Response!!!!!!\n"));
   i = _eXosip_build_response_default (excontext, &answer, jd->d_dialog, 200, evt->sip);
   if (i != 0) {
     osip_list_add (&excontext->j_transactions, transaction, 0);
     _eXosip_send_default_answer (excontext, jd, transaction, evt, 500, "Internal SIP Error", "Failed to build Answer for NOTIFY", __LINE__);
     return;
   }
+  OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_INFO1, NULL, "END Build Response!!!!!!\n"));
 #ifdef SUPPORT_MSN
   osip_message_header_get_byname (evt->sip, "expires", 0, &expires);
   if (expires != NULL && expires->hvalue != NULL && 0 == osip_strcasecmp (expires->hvalue, "0")) {
@@ -620,7 +621,7 @@ _eXosip_process_notify_within_dialog (struct eXosip_t *excontext, eXosip_subscri
       je = _eXosip_event_init_for_subscription (EXOSIP_SUBSCRIPTION_NOTIFY, js, jd);
       _eXosip_event_add (excontext, je);
     }
-
+    OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_INFO1, NULL, "Start Send Response!!!!!! expires\n"));
     sipevent = osip_new_outgoing_sipmessage (answer);
     sipevent->transactionid = transaction->transactionid;
     osip_transaction_add_event (transaction, sipevent);
@@ -665,6 +666,7 @@ _eXosip_process_notify_within_dialog (struct eXosip_t *excontext, eXosip_subscri
       _eXosip_event_add (excontext, je);
     }
 
+    OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_INFO1, NULL, "Start Send Response!!!!!! terminated\n"));
     sipevent = osip_new_outgoing_sipmessage (answer);
     sipevent->transactionid = transaction->transactionid;
     osip_transaction_add_event (transaction, sipevent);
@@ -682,11 +684,13 @@ _eXosip_process_notify_within_dialog (struct eXosip_t *excontext, eXosip_subscri
   }
 #endif
 
-  osip_list_add (jd->d_inc_trs, transaction, 0);
+  // osip_list_add (jd->d_inc_trs, transaction, 0);
+  osip_list_add (&excontext->j_transactions, transaction, 0);
 
-  sipevent = osip_new_outgoing_sipmessage (answer);
+  OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_INFO1, NULL, "Start Send Response!!!!!! last\n"));
+  // sipevent = osip_new_outgoing_sipmessage (answer);
   sipevent->transactionid = transaction->transactionid;
-  osip_transaction_add_event (transaction, sipevent);
+  // osip_transaction_add_event (transaction, sipevent);
 
   _eXosip_wakeup (excontext);
   return;
@@ -1128,7 +1132,7 @@ _eXosip_process_newrequest (struct eXosip_t *excontext, osip_event_t * evt, int 
 
       osip_dialog_update_osip_cseq_as_uas (jd->d_dialog, evt->sip);
       osip_dialog_update_route_set_as_uas (jd->d_dialog, evt->sip);
-
+      OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_INFO1, NULL, "process_notify_within_dialog 1\n"));
       _eXosip_process_notify_within_dialog (excontext, js, jd, transaction, evt);
     }
     else {
@@ -1171,7 +1175,7 @@ _eXosip_process_newrequest (struct eXosip_t *excontext, osip_event_t * evt, int 
 
         ADD_ELEMENT (js->s_dialogs, jd);
         _eXosip_update (excontext);
-
+        OSIP_TRACE (osip_trace (__FILE__, __LINE__, OSIP_INFO1, NULL, "process_notify_within_dialog 2\n"));
         _eXosip_process_notify_within_dialog (excontext, js, jd, transaction, evt);
         return;
       }
